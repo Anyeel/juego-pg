@@ -1,9 +1,12 @@
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose(); // Importar sqlite3
 const fs = require("fs"); // Importar fs para leer archivos
+const cors = require("cors");
 
 const app = express();
+app.use(cors()); // Habilitar CORS
 app.use(express.static("public"));
+app.use(express.json()); // Middleware para parsear JSON
 
 // Crear y conectar a la base de datos SQLite
 const db = new sqlite3.Database("./usuarios.db", (err) => {
@@ -35,42 +38,42 @@ app.get("/", (req, res) => {
     res.send("Hello World");
 });
 
-// Ruta para obtener todos los usuarios
-app.get("/usuarios", (req, res) => {
-    db.all("SELECT * FROM usuarios", [], (err, rows) => {
+// Ruta para obtener todos los puntajes
+app.get("/scores", (req, res) => {
+    db.all("SELECT * FROM scores", [], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json({ usuarios: rows });
+        res.json({ scores: rows });
     });
 });
 
-app.get("/usuarios/:id", (req, res) => {
+app.get("/scores/:id", (req, res) => {
     const { id } = req.params;
-    // const id = req.params.id;
-    db.all("SELECT * FROM usuarios WHERE id = ?", [id], (err, rows) => {
+    db.all("SELECT * FROM scores WHERE id = ?", [id], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json({ usuarios: rows });
+        res.json({ scores: rows });
     });
 });
 
-// Ruta para agregar un nuevo usuario
-app.post("/usuarios", express.json(), (req, res) => {
-    const { nombre } = req.body;
-    const stmt = db.prepare("INSERT INTO usuarios (nombre) VALUES (?)");
-    
-    stmt.run(nombre, function(err) {
+// Ruta para agregar un nuevo puntaje
+app.post("/scores", (req, res) => {
+    const { name, score } = req.body;
+    const stmt = db.prepare("INSERT INTO scores (name, score) VALUES (?, ?)");
+
+    stmt.run(name, score, function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
         res.status(201).json({
             id: this.lastID,
-            nombre: nombre
+            name: name,
+            score: score
         });
     });
 
