@@ -8,7 +8,7 @@ let gameOver = false;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   y = height / 2;
-  speed = 20;
+  speed = 40;
 }
 
 function draw() {
@@ -25,7 +25,7 @@ function draw() {
     }
 
     // Crear un nuevo círculo amarillo (moneda) al azar
-    if (frameCount % 50 === 0) {
+    if (frameCount % 30 === 0) {
       yellowCoins.push({ x: width, y: random(height) });
     }
 
